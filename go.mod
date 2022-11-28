@@ -1,4 +1,4 @@
-module coinscan-common
+module github.com/alexrondon89/coinscan-common
 
 go 1.18
 
