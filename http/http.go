@@ -19,8 +19,9 @@ func New(method string, host string, path string) *request {
 	return &request{req: &http.Request{
 		Method: method,
 		URL: &url.URL{
-			Host: host,
-			Path: path,
+			Scheme: "http",
+			Host:   host,
+			Path:   path,
 		},
 	},
 	}
