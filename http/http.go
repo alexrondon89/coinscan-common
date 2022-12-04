@@ -15,21 +15,15 @@ type request struct {
 	req *http.Request
 }
 
-func New() *request {
-	return &request{req: &http.Request{}}
-}
-
-func (r *request) AddMethod(method string) *request {
-	r.req.Method = method
-	return r
-}
-
-func (r *request) AddUrl(host, path string) *request {
-	r.req.URL = &url.URL{
-		Host: host,
-		Path: path,
+func New(method string, host string, path string) *request {
+	return &request{req: &http.Request{
+		Method: method,
+		URL: &url.URL{
+			Host: host,
+			Path: path,
+		},
+	},
 	}
-	return r
 }
 
 func (r *request) AddHeader(header map[string][]string) *request {
