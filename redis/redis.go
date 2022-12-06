@@ -17,9 +17,12 @@ type redisCli struct {
 
 func New(address, password string, db int) RedisIntf {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     address,
-		Password: password, // no password set
-		DB:       db,       // use default DB
+		Addr:        address,
+		Password:    password, // no password set
+		DB:          db,       // use default DB
+		ReadTimeout: 3 * time.Second,
+		IdleTimeout: 5 * time.Minute,
+		MaxRetries:  3,
 	})
 
 	return redisCli{
