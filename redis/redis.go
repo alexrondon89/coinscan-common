@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"strings"
 	"time"
 )
 
@@ -36,7 +37,7 @@ func New(host, port, password string, db int) (RedisIntf, error) {
 }
 
 func (r redisCli) SetItem(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
-	err := r.conn.Set(ctx, key, value, expiration).Err()
+	err := r.conn.Set(ctx, toLowerCase(key), value, expiration).Err()
 	if err != nil {
 		return err
 	}
@@ -45,7 +46,7 @@ func (r redisCli) SetItem(ctx context.Context, key string, value interface{}, ex
 }
 
 func (r redisCli) GetItem(ctx context.Context, key string) (string, error) {
-	val, err := r.conn.Get(ctx, key).Result()
+	val, err := r.conn.Get(ctx, toLowerCase(key)).Result()
 	if err == redis.Nil {
 		return val, errors.New("item not found")
 	} else if err != nil {
@@ -53,4 +54,8 @@ func (r redisCli) GetItem(ctx context.Context, key string) (string, error) {
 	}
 
 	return val, nil
+}
+
+func toLowerCase(key string) string {
+	return strings.ToLower(key)
 }
