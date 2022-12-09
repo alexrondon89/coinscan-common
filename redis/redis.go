@@ -21,8 +21,8 @@ func New(host, port, password string, db int) (RedisIntf, error) {
 	address := fmt.Sprintf("%s:%s", host, port)
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     address,
-		Password: password, // no password set
-		DB:       db,       // use default DB
+		Password: password,
+		DB:       db,
 	})
 
 	_, err := rdb.Ping(context.Background()).Result()
@@ -47,7 +47,7 @@ func (r redisCli) SetItem(ctx context.Context, key string, value interface{}, ex
 func (r redisCli) GetItem(ctx context.Context, key string) (string, error) {
 	val, err := r.conn.Get(ctx, key).Result()
 	if err == redis.Nil {
-		return val, err // Chequear esto
+		return val, errors.New("item not found")
 	} else if err != nil {
 		return val, err
 	}
