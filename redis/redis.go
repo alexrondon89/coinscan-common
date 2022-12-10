@@ -38,6 +38,17 @@ func New(host, port, password string, db int) (RedisIntf, error) {
 	}, nil
 }
 
+func (r redisCli) Scan(ctx context.Context, cursor uint64, match string, count int64) ([]string, uint64, error) {
+	keys, cursor, err := r.conn.Scan(ctx, cursor, match, count).Result()
+	if err == redis.Nil {
+		return nil, 0, errors.New("item not found")
+	} else if err != nil {
+		return nil, 0, errors.New("error doing redis scan, " + err.Error())
+	}
+
+	return keys, cursor, nil
+}
+
 func (r redisCli) SetItem(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
 	err := r.conn.Set(ctx, toLowerCase(key), value, expiration).Err()
 	if err != nil {
