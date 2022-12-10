@@ -12,7 +12,7 @@ import (
 type RedisIntf interface {
 	SetItem(ctx context.Context, key string, value interface{}, expiration time.Duration) error
 	GetItem(ctx context.Context, key string) (string, error)
-	InsertElementInList(ctx context.Context, key string) (int64, error)
+	InsertElementInList(ctx context.Context, key string, values ...interface{}) (int64, error)
 	GetElementsInList(ctx context.Context, key string, start int64, stop int64) ([]string, error)
 }
 
@@ -58,8 +58,8 @@ func (r redisCli) GetItem(ctx context.Context, key string) (string, error) {
 	return val, nil
 }
 
-func (r redisCli) InsertElementInList(ctx context.Context, key string) (int64, error) {
-	val, err := r.conn.LPush(ctx, toLowerCase(key)).Result()
+func (r redisCli) InsertElementInList(ctx context.Context, key string, values ...interface{}) (int64, error) {
+	val, err := r.conn.LPush(ctx, toLowerCase(key), values).Result()
 	if err == redis.Nil {
 		return val, errors.New("error inserting element in list")
 	} else if err != nil {
