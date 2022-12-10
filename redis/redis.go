@@ -14,6 +14,7 @@ type RedisIntf interface {
 	GetItem(ctx context.Context, key string) (string, error)
 	InsertElementInList(ctx context.Context, expiration *time.Duration, key string, values ...interface{}) (int64, error)
 	GetElementsInList(ctx context.Context, key string, start int64, stop int64) ([]string, error)
+	Scan(ctx context.Context, cursor uint64, match string, count int64) ([]string, uint64, error)
 }
 
 type redisCli struct {
