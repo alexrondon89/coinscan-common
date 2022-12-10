@@ -12,7 +12,7 @@ import (
 type RedisIntf interface {
 	SetItem(ctx context.Context, key string, value interface{}, expiration time.Duration) error
 	GetItem(ctx context.Context, key string) (string, error)
-	InsertElementInList(ctx context.Context, key string, values ...interface{}) (int64, error)
+	InsertElementInList(ctx context.Context, expiration *time.Duration, key string, values ...interface{}) (int64, error)
 	GetElementsInList(ctx context.Context, key string, start int64, stop int64) ([]string, error)
 }
 
@@ -58,15 +58,22 @@ func (r redisCli) GetItem(ctx context.Context, key string) (string, error) {
 	return val, nil
 }
 
-func (r redisCli) InsertElementInList(ctx context.Context, key string, values ...interface{}) (int64, error) {
-	val, err := r.conn.LPush(ctx, toLowerCase(key), values).Result()
+func (r redisCli) InsertElementInList(ctx context.Context, expiration *time.Duration, key string, values ...interface{}) (int64, error) {
+	intCmd := r.conn.LPush(ctx, toLowerCase(key), values)
+	if expiration != nil {
+		_, err := r.conn.Expire(ctx, key, *expiration).Result()
+		if err != nil {
+			return 0, errors.New("error setting expire time to key " + key + ". " + err.Error())
+		}
+	}
+	resp, err := intCmd.Result()
 	if err == redis.Nil {
-		return val, errors.New("error inserting element in list")
+		return resp, errors.New("error inserting element in list")
 	} else if err != nil {
-		return val, err
+		return resp, err
 	}
 
-	return val, nil
+	return resp, nil
 }
 
 func (r redisCli) GetElementsInList(ctx context.Context, key string, start int64, stop int64) ([]string, error) {
