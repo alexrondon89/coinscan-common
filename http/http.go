@@ -1,9 +1,9 @@
 package http
 
 import (
+	"io"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 )
 
 type response struct {
@@ -15,16 +15,14 @@ type request struct {
 	req *http.Request
 }
 
-func New(method string, host string, path string) *request {
-	return &request{req: &http.Request{
-		Method: method,
-		URL: &url.URL{
-			Scheme: "http",
-			Host:   host,
-			Path:   path,
-		},
-	},
+func New(method string, host, path string, body io.Reader) (*request, error) {
+	req, err := http.NewRequest(method, host+path, body)
+	if err != nil {
+		return nil, err
 	}
+	return &request{
+		req: req,
+	}, nil
 }
 
 func (r *request) AddHeader(header map[string][]string) *request {
