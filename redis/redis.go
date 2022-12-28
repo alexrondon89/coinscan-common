@@ -99,6 +99,17 @@ func (r redisCli) GetElementsInList(ctx context.Context, key string, start int64
 	return val, nil
 }
 
+func (r redisCli) SortElements(ctx context.Context, key string, start int64, stop int64) ([]string, error) {
+	val, err := r.conn.LRange(ctx, toLowerCase(key), start, stop).Result()
+	if err == redis.Nil {
+		return val, errors.New("error getting element in list")
+	} else if err != nil {
+		return val, err
+	}
+
+	return val, nil
+}
+
 func toLowerCase(key string) string {
 	return strings.ToLower(key)
 }

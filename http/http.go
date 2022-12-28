@@ -32,6 +32,11 @@ func (r *request) AddHeader(header map[string][]string) *request {
 	return r
 }
 
+func (r *request) AddHost(host string) *request {
+	r.req.Host = host
+	return r
+}
+
 func (r *request) Exec() (response, error) {
 	client := http.Client{}
 	respReq, err := client.Do(r.req)
