@@ -1,7 +1,7 @@
 package error
 
 type Error interface {
-	Error() string
+	error
 	StatusCode() int
 	InternalCode() string
 	Type() ErrorType
