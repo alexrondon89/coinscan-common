@@ -1,9 +1,11 @@
 package client
 
 import (
+	"context"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 type response struct {
@@ -35,7 +37,13 @@ func (r *request) AddHost(host string) *request {
 	return r
 }
 
-func (r *request) Exec() (response, error) {
+func (r *request) Exec(timeout ...time.Duration) (response, error) {
+	if timeout != nil {
+		ctxWithTimeOut, cancelFunc := context.WithTimeout(r.req.Context(), timeout[0])
+		defer cancelFunc()
+		r.req.WithContext(ctxWithTimeOut)
+	}
+
 	client := http.Client{}
 	respReq, err := client.Do(r.req)
 	if err != nil {
