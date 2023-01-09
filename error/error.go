@@ -21,7 +21,11 @@ type ErrorType struct {
 }
 
 func (err ErrorType) Error() string {
-	return err.Msg + " " + err.OriginalErr.Error()
+	if err.OriginalErr != nil {
+		return err.Msg + " " + err.OriginalErr.Error()
+	}
+
+	return err.Msg
 }
 
 func (err ErrorType) StatusCode() int {
