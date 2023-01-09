@@ -2,41 +2,32 @@ package error
 
 type Error interface {
 	error
-	StatusCode() int
-	InternalCode() string
-	Type() ErrorType
+	StatusCode()
+	Message()
 }
 
-func New(errorType ErrorType, originalError error) Error {
-	return Err{
-		ErrorType:     errorType,
-		OriginalError: originalError,
+func New(message string, http int, originalErr error) ErrorType {
+	return ErrorType{
+		Msg:         message,
+		HttpCode:    http,
+		OriginalErr: originalErr,
 	}
 }
 
-type Err struct {
-	OriginalError error
-	ErrorType     ErrorType
-}
-
 type ErrorType struct {
-	Message      string `json:"message"`
-	InternalCode string `json:"codeError"`
-	HttpCode     int    `json:"codeHttp"`
+	Msg         string `json:"message"`
+	HttpCode    int    `json:"httpCode"`
+	OriginalErr error  `json:"originalErr"`
 }
 
-func (err Err) Error() string {
-	return err.ErrorType.Message
+func (err ErrorType) Error() string {
+	return err.Msg + " " + err.OriginalErr.Error()
 }
 
-func (err Err) StatusCode() int {
-	return err.ErrorType.HttpCode
+func (err ErrorType) StatusCode() int {
+	return err.HttpCode
 }
 
-func (err Err) InternalCode() string {
-	return err.ErrorType.InternalCode
-}
-
-func (err Err) Type() ErrorType {
-	return err.ErrorType
+func (err ErrorType) Message() string {
+	return err.Msg
 }
