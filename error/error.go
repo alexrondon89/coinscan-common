@@ -2,8 +2,8 @@ package error
 
 type Error interface {
 	error
-	StatusCode()
-	Message()
+	StatusCode() int
+	Message() string
 }
 
 func New(message string, http int, originalErr error) ErrorType {
